@@ -1,6 +1,6 @@
 # Temperature Sensor — QA Engineer Kata
 
-Full-stack temperature sensor simulation app. The QA candidate is responsible for building the entire test coverage.
+Full-stack temperature sensor simulation app. The QA candidate is responsible for building test coverage.
 
 > ⚠️ **This project is delivered without any tests.** It is intended as support material for a QA exercise.
 
@@ -59,59 +59,70 @@ Single page with 3 sections:
 
 ## QA Exercise — Expectations
 
+**Duration: 3 hours maximum.**
+
 This project is intentionally delivered with **zero tests** and contains **deliberate bugs, edge cases, and inconsistencies** for candidates to discover and cover. Finding them is part of the exercise.
 
-### Test coverage expected
+> We value **depth over breadth** — a few well-written tests that demonstrate edge-case thinking and catch real bugs are worth more than shallow happy-path coverage of every endpoint.
 
-#### 1. UI / E2E — Playwright + Cucumber
+---
 
-- Write BDD scenarios in Gherkin (`.feature` files)
-- Implement step definitions using Playwright
-- Cover the following flows:
-  - Capture a temperature and verify the result display
-  - Verify history table updates after capture
-  - Update thresholds with valid values
-  - Submit invalid thresholds and verify error messages
-  - Verify button is disabled during capture (no double-click)
-  - Verify color-coded badges (COLD=blue, WARM=orange, HOT=red)
-  - Keyboard navigation and basic accessibility
+### Deliverable 1 — Test Strategy Document (~45 min)
 
-#### 2. API — Karate
+Before writing any code, explore the app and its API, then produce a short document covering:
 
-- Test all 4 API endpoints:
-  - `POST /api/temperature/capture` — status 201, response schema validation
-  - `GET /api/temperature/history` — pagination (max 15), ordering (newest first)
-  - `GET /api/thresholds` — returns current config
-  - `PUT /api/thresholds` — valid updates, validation errors (400)
-- Cover edge cases:
-  - Boundary values for thresholds
-  - Invalid input types in PUT body
-  - Extreme gap values between thresholds
-  - `coldMax > hotMin`
-- Verify response schema consistency across endpoints
-- Use `FIXED_TEMPERATURE` env variable for deterministic test scenarios
+- **Bug identification**: List any bugs, inconsistencies, or missing validations you find.
+- **Test plan**: What would you test and why? What are the high-risk areas?
+- **Prioritization**: If you had limited time, which tests deliver the most value first?
+- **Edge cases**: List boundary values and negative scenarios worth covering.
+- **What you would add with more time**: Performance testing, CI/CD pipeline, additional coverage — describe briefly.
 
-#### 3. Performance — K6
+> This is not a formal document. Bullet points are fine. We want to see how you think, not how you format.
 
-- Load test the capture endpoint under concurrency
-- Stress test threshold updates
-- Verify response times stay under acceptable limits (e.g. p95 < 200ms)
-- Ramp-up scenarios (gradual load increase)
-- Identify potential bottlenecks (database writes, connection pooling)
+---
 
-#### 4. Automation & CI/CD
+### Deliverable 2 — API Tests (separate project, ~1h)
 
-- All tests must be runnable in a CI pipeline
-- Provide a `docker-compose.test.yml` or equivalent for isolated test execution
-- Generate test reports (HTML, JUnit XML)
-- Code coverage measurement where applicable
-- Tests must be idempotent and independent (no shared state between runs)
+Create a dedicated Karate test project targeting these two endpoints:
+
+- `POST /api/temperature/capture`
+- `PUT /api/thresholds`
+
+**Requirements:**
+- Tests must be runnable with a single command (provide instructions in a README)
+- Tests must be deterministic and independent
+- Use `FIXED_TEMPERATURE` env variable for deterministic capture scenarios
+
+---
+
+### Deliverable 3 — E2E Tests (separate project, ~1h15)
+
+Create a dedicated Playwright test project covering the dashboard UI.
+
+**Requirements:**
+- Tests must be runnable with a single command (provide instructions in a README)
+- Use `FIXED_TEMPERATURE` for deterministic scenarios
+- Tests must be independent (no shared state between runs)
+
+> Adding Cucumber/BDD on top is optional. If you do, make sure it adds clarity, not just boilerplate.
+
+---
+
+### Bonus (optional, if time allows)
+
+- CI/CD: Provide a `docker-compose.test.yml` or pipeline config for isolated test execution
+- Test reports: HTML or JUnit XML output
+- Performance: K6 script for load testing the capture endpoint
+- Accessibility: Keyboard navigation, ARIA attributes validation
+
+---
 
 ### Evaluation criteria
 
-- **Coverage** — All endpoints and UI flows are tested
-- **Edge cases** — Deliberate bugs/inconsistencies are identified and covered
-- **Code quality** — Tests are readable, maintainable, and follow conventions
-- **Determinism** — Tests produce consistent results (use `FIXED_TEMPERATURE`)
-- **Reporting** — Clear test reports with pass/fail visibility
-- **Architecture** — Clean separation between test types (unit, integration, E2E, performance)
+| Criteria | Weight | What we look for |
+|----------|--------|------------------|
+| Bug identification | 25% | Did you find the planted inconsistencies and missing validations? |
+| Test strategy quality | 25% | Prioritization, risk-based thinking, edge-case awareness |
+| Code quality | 25% | Clean structure, readable tests, meaningful assertions |
+| Runability | 15% | Can we run your tests with one command? Clear instructions? |
+| Coverage depth | 10% | Beyond happy paths — boundary values, negative scenarios |
