@@ -1,0 +1,41 @@
+services:
+  db-test:
+    image: postgres:18-alpine
+    environment:
+      POSTGRES_DB: temperature_sensor
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: password
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U admin -d temperature_sensor"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  app-test:
+    build:
+      context: ..
+    environment:
+      DATABASE_URL: postgresql://admin:password@db-test:5432/temperature_sensor
+      FIXED_TEMPERATURE: ${FIXED_TEMPERATURE:-25.5}
+      HOSTNAME: 0.0.0.0
+    depends_on:
+      db-test:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "node", "-e", "fetch('http://127.0.0.1:3000/api/thresholds').then((r) => { if (!r.ok) process.exit(1); }).catch(() => process.exit(1));"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+      start_period: 15s
+
+  karate:
+    build:
+      context: .
+    environment:
+      BASE_URL: http://app-test:3000
+      FIXED_TEMPERATURE: ${FIXED_TEMPERATURE:-25.5}
+    depends_on:
+      app-test:
+        condition: service_healthy
+    volumes:
+      - ./target:/karate/target
