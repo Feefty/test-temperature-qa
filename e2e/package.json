@@ -1,0 +1,12 @@
+{
+  "name": "temperature-sensor-e2e",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Playwright E2E tests for the Temperature Sensor dashboard",
+  "scripts": {
+    "test": "playwright test"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.62.1"
+  }
+}
