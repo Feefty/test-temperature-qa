@@ -1,0 +1,22 @@
+# Standalone test projects - not part of the app build
+karate-api-tests
+playwright-e2e-tests
+
+# dependencies
+node_modules
+.pnpm-store
+.yarn/cache
+.yarn/unplugged
+
+# next.js
+.next/
+out/
+
+# misc
+.git
+.DS_Store
+*.pem
+
+# local env files
+.env
+.env*.local
