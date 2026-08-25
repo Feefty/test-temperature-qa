@@ -36,6 +36,8 @@
     ".next/dev/types/**/*.ts"
   ],
   "exclude": [
-    "node_modules"
+    "node_modules",
+    "karate-api-tests",
+    "playwright-e2e-tests"
   ]
 }
