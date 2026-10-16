@@ -123,7 +123,7 @@ model Threshold {
   "state": "WARM",
   "coldMax": 22,
   "hotMin": 35,
-  "timestamp": "2026-06-15T10:00:00.000Z"
+  "capturedAt": "2026-06-15T10:00:00.000Z"
 }
 ```
 
@@ -164,6 +164,7 @@ Returns the active thresholds.
 ### `PUT /api/thresholds`
 
 Updates the thresholds. Validation rules implemented:
+- The body must be valid JSON; `coldMax` and `hotMin` are required finite numbers.
 - `coldMax` must be strictly less than `hotMin`.
 - The minimum gap must be 2°C.
 
@@ -233,7 +234,7 @@ export function readTemperature(): number {
 
 - Range: -10°C to 50°C
 - Precision: 1 decimal place
-- If the environment variable `FIXED_TEMPERATURE` is set, returns that value (for determinism in test/demo scenarios).
+- If the environment variable `FIXED_TEMPERATURE` is set, returns that value (for determinism in test/demo scenarios). The value must be a number within the sensor range; otherwise the capture fails with a 500 error.
 
 ---
 

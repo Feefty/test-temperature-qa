@@ -4,7 +4,16 @@ import { readTemperature } from "@/lib/sensor";
 import { classifyTemperature } from "@/lib/classifier";
 
 export async function POST() {
-  const temperature = readTemperature();
+  // FIX #7
+  let temperature: number;
+  try {
+    temperature = readTemperature();
+  } catch (error) {
+    return NextResponse.json(
+      { error: (error as Error).message, statusCode: 500 },
+      { status: 500 }
+    );
+  }
 
   const thresholds = await prisma.threshold.findUniqueOrThrow({
     where: { id: "singleton" },
@@ -28,7 +37,8 @@ export async function POST() {
       state: reading.state,
       coldMax: reading.coldMax,
       hotMin: reading.hotMin,
-      timestamp: reading.capturedAt.toISOString(), // Intentional inconsistency: "timestamp" instead of "capturedAt"
+      // FIX #6 : le champ s'appelait "timestamp" ici mais "capturedAt" dans /history → même nom partout.
+      capturedAt: reading.capturedAt.toISOString(),
     },
     { status: 201 }
   );

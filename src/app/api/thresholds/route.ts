@@ -13,10 +13,33 @@ export async function GET() {
 }
 
 export async function PUT(request: NextRequest) {
-  const body = await request.json();
-  const { coldMax, hotMin } = body;
+  // FIX #4 : un corps qui n'est pas du JSON valide faisait planter request.json() → 500.
+  
+  let body: unknown;
+  try {
+    body = await request.json();
+  } catch {
+    return NextResponse.json(
+      { error: "Request body must be valid JSON", statusCode: 400 },
+      { status: 400 }
+    );
+  }
 
-  // Intentional: no check that coldMax/hotMin are actually numbers before logic
+  // FIX #1/#2/#3 : body peut valoir null (JSON "null") → on évite le crash à la déstructuration.
+  const { coldMax, hotMin } = (body ?? {}) as Record<string, unknown>;
+
+  // FIX #1/#2/#3 : aucune vérification de type avant. Conséquences :
+
+  if (
+    typeof coldMax !== "number" || !Number.isFinite(coldMax) ||
+    typeof hotMin !== "number" || !Number.isFinite(hotMin)
+  ) {
+    return NextResponse.json(
+      { error: "coldMax and hotMin are required and must be numbers", statusCode: 400 },
+      { status: 400 }
+    );
+  }
+
   if (coldMax >= hotMin) {
     return NextResponse.json(
       { error: "coldMax must be strictly less than hotMin", statusCode: 400 },
@@ -24,7 +47,9 @@ export async function PUT(request: NextRequest) {
     );
   }
 
-  if (hotMin - coldMax < 2) {
+  // FIX #5 : erreur d'arrondi des flottants. 2.3 - 0.3 = 1.9999999999999998 < 2 → écart valide rejeté.
+ 
+  if (Math.round((hotMin - coldMax) * 1000) / 1000 < 2) {
     return NextResponse.json(
       { error: "Minimum gap between coldMax and hotMin must be 2°C", statusCode: 400 },
       { status: 400 }
