@@ -10,33 +10,53 @@ export function ThresholdForm() {
 
   useEffect(() => {
     fetch("/api/thresholds")
-      .then((res) => res.json())
+      .then((res) => {
+        // FIX #12 : une erreur au chargement était ignorée (champs vides sans explication).
+        if (!res.ok) throw new Error();
+        return res.json();
+      })
       .then((data) => {
         setColdMax(String(data.coldMax));
         setHotMin(String(data.hotMin));
+      })
+      .catch(() => {
+        setMessage({ type: "error", text: "Unable to load thresholds." });
       });
   }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setSaving(true);
     setMessage(null);
 
-    const res = await fetch("/api/thresholds", {
-      method: "PUT",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ coldMax: parseFloat(coldMax), hotMin: parseFloat(hotMin) }),
-    });
-
-    const data = await res.json();
-
-    if (res.ok) {
-      setMessage({ type: "success", text: "Thresholds updated successfully." });
-    } else {
-      setMessage({ type: "error", text: data.error });
+    // FIX #10 : un champ vide donnait parseFloat("") → NaN → envoyé comme null → 500 côté serveur.
+    if (coldMax.trim() === "" || hotMin.trim() === "") {
+      setMessage({ type: "error", text: "Both thresholds are required." });
+      return;
     }
 
-    setSaving(false);
+    setSaving(true);
+
+    // FIX #9 : sans try/finally, si res.json() échouait (réponse 500 non-JSON),
+    // setSaving(false) n'était jamais appelé → bouton bloqué sur "Saving..." pour toujours.
+    try {
+      const res = await fetch("/api/thresholds", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ coldMax: parseFloat(coldMax), hotMin: parseFloat(hotMin) }),
+      });
+
+      const data = await res.json();
+
+      if (res.ok) {
+        setMessage({ type: "success", text: "Thresholds updated successfully." });
+      } else {
+        setMessage({ type: "error", text: data.error });
+      }
+    } catch {
+      setMessage({ type: "error", text: "Unable to save thresholds. Please try again." });
+    } finally {
+      setSaving(false);
+    }
   };
 
   return (
