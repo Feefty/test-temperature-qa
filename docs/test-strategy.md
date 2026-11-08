@@ -77,3 +77,7 @@ Consider equality, 1.9Â°C/2.0Â°C/2.1Â°C gaps, reversed and negative thresh
 3. Add deterministic equality and classification boundary cases, stronger response schemas, and error-handling assertions.
 4. Extend browser coverage, accessibility checks, network-failure handling, and optional performance/load tests for capture.
 5. Review timestamp contract consistency and notification lifecycle with the product owner.
+
+## Executable test-case traceability
+
+See [Test Case Catalogue](test-cases.md) for the implemented API and E2E scenario inventory, source references, and known-defect mapping.
