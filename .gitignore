@@ -30,3 +30,16 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# Feefty QA generated artifacts and local setup helpers
+/tests/api/target/
+/tests/api/reports/
+/tests/api/execution-logs/
+/extend-feefty-*.ps1
+
+/tests/e2e/test-results/
+/tests/e2e/playwright-report/
+/tests/e2e/execution-logs/
+/setup-feefty-playwright.ps1
+/harden-feefty-tests.ps1
+/node_modules/
