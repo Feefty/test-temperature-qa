@@ -125,6 +125,13 @@ Create a dedicated Playwright test project covering the dashboard UI.
 
 ---
 
+### Submission
+
+  Create a **new private GitHub repository** (do not fork this public project — a fork would stay public). Push your work there, and once finished, invite **shackdown** and **lz-glitch** as
+  **collaborators** (read access) and let us know.
+
+---
+  
 ### Evaluation criteria
 
 | Criteria | Weight | What we look for |
